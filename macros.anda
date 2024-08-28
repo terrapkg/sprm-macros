@@ -1,17 +1,6 @@
-%git_clone(Rc) %{lua:
-        local dir = rpm.expand("%{_builddir}/%{name}-%{version}")
-        -- if dir exists, remove it
-        os.execute("rm -rf " .. dir)
-        os.execute(rpm.expand("%{__git} clone %{-R:--recursive} %{1} " .. dir))
-        posix.chdir(dir)
-        if rpm.expand("-c") ~= "" then
-            os.execute(rpm.expand("%{__git} checkout %{2}"))
-        end
+# by default, add a bcond_without for a mold linker
+# https://rpm-software-management.github.io/rpm/manual/conditionalbuilds.html
+%with_mold 1
 
-        -- tarball the folder
-        local tarball = rpm.expand("%{_sourcedir}/%{name}-%{version}.tar.gz")
-        os.execute("tar -C ".. dir .. "/../ " .. " -czvf " .. tarball .. " " .. rpm.expand("%{name}-%{version}"))
-
-
-        print(rpm.expand("%{name}-%{version}.tar.gz"))
-    }
+# git_clone <repo_url> <tag/branch/ref>
+%git_clone() rm -rf .* * && git clone --depth 1 --recurse-submodules -j8 %1 . -b %2
