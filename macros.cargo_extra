@@ -32,9 +32,7 @@ directory = "%{cargo_registry}"\
 \
 EOF\
 %{__rm} -f Cargo.toml.orig \
-%if %{with mold}\
-%global build_rustflags %build_rustflags -C link-arg=-fuse-ld=mold\
-%endif\
+%global build_rustflags %build_rustflags %[%{with mold} ? "-C link-arg=-fuse-ld=mold" : ""]\
 )
 
 
