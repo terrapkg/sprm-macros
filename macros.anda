@@ -1,6 +1,7 @@
 # by default, add a bcond_without for a mold linker
 # https://rpm-software-management.github.io/rpm/manual/conditionalbuilds.html
-%with_mold 1
+# only enable this on fedora
+%with_mold 0%{?fedora:1}
 
 # git_clone <repo_url> <tag/branch/ref>
 %git_clone() rm -rf .* * && git clone --depth 1 --recurse-submodules -j8 %1 . -b %2
