@@ -3,5 +3,23 @@
 # only enable this on fedora
 %with_mold 0%{?fedora:1}
 
-# git_clone <repo_url> <tag/branch/ref>
-%git_clone() rm -rf .* * && git clone --depth 1 --recurse-submodules -j8 %1 . -b %2
+# git_clone [<repo_url>] [<ref>]
+%git_clone() %{lua:
+  local url = rpm.expand("%?1%{!?1:%url}")
+  if (url == '%url') or (url == '') then
+    error("%url is not defined")
+  end
+  local ref = rpm.expand("%?2%{!?2:%?commit%{!?commit:%version}}")
+  if (ref == '%version') or (branch == '') then
+    error("%version is not defined")
+  end
+  local command = 'git clone --recurse-submodules -q -j$(nproc) ' .. url
+  if (ref:len() == 40 or ref:len() == 7) and not(ref:find("%X")) then
+    command = command .. ' && git checkout -q ' .. ref
+  else
+    command = command .. ' --depth 1 -b ' .. ref
+  end
+  # BUG: rpm.define() takes only 1 arg…???
+  rpm.define("buildsubdir " .. url:gsub("/(%.git)?$", ""):gsub("^.+/", ""))
+  print(command)
+}
