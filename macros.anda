@@ -20,6 +20,6 @@
     command = command .. ' --depth 1 -b ' .. ref
   end
   # BUG: rpm.define() takes only 1 arg…???
-  rpm.define("buildsubdir " .. url:gsub("/(%.git)?$", ""):gsub("^.+/", ""))
+  rpm.define("buildsubdir " .. ((url:gsub("/(%.git)?$", "")):gsub("^.+/", "")))
   print(command)
 }
