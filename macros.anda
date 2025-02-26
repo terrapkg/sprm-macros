@@ -13,15 +13,16 @@
   if (ref == '%version') or (branch == '') then
     error("%version is not defined")
   end
+  local dir = (url:gsub("/(%.git)?$", "")):gsub("^.+/", "")
   local command = 'git clone --recurse-submodules -q -j$(nproc) ' .. url
   if (ref:len() == 40 or ref:len() == 7) and not(ref:find("%X")) then
-    command = command .. ' && git checkout -q ' .. ref
+    command = command .. ' && cd ' .. dir .. ' && git checkout -q ' .. ref
   else
-    command = command .. ' --depth 1 -b ' .. ref
+    command = command .. ' --depth 1 -b ' .. ref .. ' && cd ' .. dir
   end
   -- BUG: rpm.define() takes only 1 arg…???
-  rpm.define("buildsubdir " .. ((url:gsub("/(%.git)?$", "")):gsub("^.+/", "")))
-  print(command .. " && cd " .. ((url:gsub("/(%.git)?$", "")):gsub("^.+/", "")))
+  rpm.define("buildsubdir " .. dir)
+  print(command)
 }
 
 # applicable to specs generated using rust2rpm
